@@ -25,7 +25,7 @@ def tokenize(text):
     tokens = nltk.word_tokenize(text)
     # stemming tokens, if not a stopword
     return [
-        STEMMER.stem(token) for token in tokens 
+        STEMMER.stem(token) for token in tokens
         if token not in STOPWORDS
     ]
 
@@ -47,10 +47,10 @@ def get_text_list_from_disk(basedir):
 
 class BagOfWords(object):
     def __init__(self, texts, bag_size):
-        histogram_total = sum(get_histograms(texts))
-        self.histogram = histogram_total.most_common(bag_size)
+        histogram = reduce(lambda a,b: a+b, get_histograms(texts))
         self.features = {
-            word[0]: index for (index, word) in enumerate(self.histogram)
+            word[0]: index for (index, word) in
+            enumerate(histogram.most_common(bag_size))
         }
 
     @classmethod
@@ -58,13 +58,13 @@ class BagOfWords(object):
         return cls(get_text_list_from_disk(basedir), bag_size)
 
     def get_features_array(self, texts):
-        X_array = np.empty(shape=(0, len(self.histogram)), dtype=np.integer)
-        
+        X_array = np.empty(shape=(0, len(self.features)), dtype=np.integer)
+
         for text_hist in get_histograms(texts):
+            row = np.zeros(shape=len(self.features), dtype=np.integer)
             for token in text_hist:
-                if token in self.histogram:
-                    row = np.zeros(shape=len(self.histogram), dtype=np.integer)
-                    row[self.histogram[token]] = text_hist[token]
-                    X_array = np.vstack( (X_array, row) )
-                    
+                if token in self.features:
+                    row[self.features[token]] = text_hist[token]
+            X_array = np.vstack( (X_array, row) )
+
         return X_array
