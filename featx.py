@@ -52,6 +52,16 @@ def label_feats_from_dir(datadir='data', feat_detector=bag_of_bigrams_words):
     return label_feats
 
 
+def label_feats_from_dataframe(data, feat_detector=bag_of_bigrams_words):
+    label_feats = collections.defaultdict(list)
+    for index, row in data.iterrows():
+        label = row['label']
+        text = row['text']
+        feats = feat_detector(clean_up(text))
+        label_feats[label].append(feats)
+    return label_feats
+
+
 def split_label_feats(lfeats, split=0.75):
     train_feats = []
     test_feats = []
