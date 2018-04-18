@@ -1,12 +1,12 @@
-from nltk.metrics import BigramAssocMeasures
-from nltk.corpus import stopwords
-from nltk.collocations import BigramCollocationFinder
 from nltk.classify import NaiveBayesClassifier
 from nltk.classify.util import accuracy
+from nltk.collocations import BigramCollocationFinder
+from nltk.corpus import stopwords
+from nltk.metrics import BigramAssocMeasures
 
+import collections
 import os
 import re
-import collections
 
 
 def bag_of_words(words):
@@ -30,12 +30,8 @@ def bag_of_bigrams_words(words, score_fn=BigramAssocMeasures.chi_sq, n=200):
 
 
 def clean_up(text):
-    import bag_of_words
-    import re
-    words = filter(
-        lambda item: True if item else False,
-        re.sub('\W+', ' ', bag_of_words.clean_text(text)).split(' '),
-    )
+    text =  re.sub('\W+', ' ', text.lower())
+    words = filter(bool, text.split(' '))
     return list(words)
 
 
